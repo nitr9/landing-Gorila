@@ -9,14 +9,29 @@ tipografía cinematográfica.
 
 Funcionando: el hero completo, con video en loop sin corte y texto legible
 sobre todas las zonas del video. Verificado en escritorio, tablet y móvil.
-Guardado en git (commit inicial `cae72a0`).
 
 **Para retomar:** `npm run dev` y abrir http://localhost:5173/
 
-Lo próximo son las secciones 2 y 3 (noche y amanecer). La identidad, el arco
-narrativo y los textos ya están definidos en [ideas/IDENTIDAD.md](ideas/IDENTIDAD.md);
-falta generar un video propio para cada una — a pantalla completa, no como
-panel dividido, porque los paneles del hero miden 310px y se pixelan al ampliarlos.
+### Pendiente principal: la definición del video
+
+El video se ve blando y todavía no está resuelto. Dos caminos, en orden de
+probabilidad de éxito:
+
+1. **Regenerar en Flow a pantalla completa** (recomendado). La composición
+   actual son cuatro paneles verticales, así que cada uno usa solo 310 px de
+   ancho. Una sola escena con los mismos 1280 px se ve cuatro veces más
+   nítida. Esto puede resolver el problema sin necesitar 4K.
+2. **Upscale en Flow**, si el plan lo incluye. Ver la sección "Resolución del
+   video" más abajo.
+
+Si ninguna funciona, la alternativa es cambiar de fondo y de historia. La
+identidad en `ideas/IDENTIDAD.md` es adaptable: lo único atado a este video
+es el gesto de las manos que casi se tocan.
+
+### Después de eso
+
+Las secciones 2 y 3 (noche y amanecer). Identidad, arco narrativo y textos ya
+definidos en [ideas/IDENTIDAD.md](ideas/IDENTIDAD.md); falta el video de cada una.
 
 ## Comandos
 
