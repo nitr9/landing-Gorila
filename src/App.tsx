@@ -1,17 +1,7 @@
-import { Hero } from '@/components/Hero'
-import { Navigation } from '@/components/Navigation'
-import { VideoBackground } from '@/components/VideoBackground'
-
 function App() {
   return (
-    <main className="relative min-h-screen w-full overflow-hidden bg-background">
-      <VideoBackground />
-      <div className="relative z-10 flex min-h-screen flex-col">
-        <Navigation />
-        <div className="flex flex-1 items-center justify-center">
-          <Hero />
-        </div>
-      </div>
+    <main className="flex min-h-screen w-full items-center justify-center bg-background">
+      <p className="text-sm text-muted-foreground">Proyecto nuevo</p>
     </main>
   )
 }

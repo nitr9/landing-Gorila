@@ -11,3 +11,9 @@ originales
 
 # build info de TypeScript
 *.tsbuildinfo
+
+# Obsidian
+.obsidian/
+
+# material grafico: no commitear videos ni imagenes pesadas
+public/video/
