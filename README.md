@@ -5,6 +5,19 @@ tipografía cinematográfica.
 
 **Stack:** React 18 + Vite 6 + TypeScript + Tailwind CSS + shadcn/ui
 
+## Estado (2 de septiembre de 2026)
+
+Funcionando: el hero completo, con video en loop sin corte y texto legible
+sobre todas las zonas del video. Verificado en escritorio, tablet y móvil.
+Guardado en git (commit inicial `cae72a0`).
+
+**Para retomar:** `npm run dev` y abrir http://localhost:5173/
+
+Lo próximo son las secciones 2 y 3 (noche y amanecer). La identidad, el arco
+narrativo y los textos ya están definidos en [ideas/IDENTIDAD.md](ideas/IDENTIDAD.md);
+falta generar un video propio para cada una — a pantalla completa, no como
+panel dividido, porque los paneles del hero miden 310px y se pixelan al ampliarlos.
+
 ## Comandos
 
 ```bash
