@@ -7,26 +7,22 @@ primera vez en esta sesión, seguí el orden de abajo antes de tocar código.
 
 ## Qué es esto
 
-Landing de una sola página para **NicoNT®**. Es un ejercicio de diseño, no un
-encargo de cliente: la vara es estética, no de negocio.
+Un proyecto web **por definir**. La landing anterior se descartó el 2 de
+septiembre de 2026 y todavía no se decidió qué se construye en su lugar.
 
-La tesis que sostiene todo: **el silencio es donde se trabaja**. Lo bueno se
-hace en soledad, sin público y sin validación. El slogan "Where dreams rise
-through the silence" es una afirmación sobre cómo se hace el trabajo
-creativo, no una frase decorativa.
+Lo que quedó es el andamiaje: **React 18 + Vite 6 + TypeScript + Tailwind +
+shadcn/ui**. Nada del contenido anterior sobrevive.
 
-**Stack:** React 18 + Vite 6 + TypeScript + Tailwind + shadcn/ui.
-El detalle de comandos y estructura está en [README.md](../README.md).
+**Antes de construir nada, hay que definir el proyecto nuevo.** Si no está
+definido en [ESTADO.md](ESTADO.md), preguntarlo en vez de asumirlo.
 
 ---
 
 ## Leer antes de tocar nada
 
-1. **[notas/ESTADO.md](ESTADO.md)** — dónde estamos hoy y qué está bloqueando
+1. **[notas/ESTADO.md](ESTADO.md)** — dónde estamos hoy y qué falta definir
 2. **[notas/DECISIONES.md](DECISIONES.md)** — por qué las cosas son como son,
    incluidos los caminos que ya se descartaron
-3. **[ideas/IDENTIDAD.md](../ideas/IDENTIDAD.md)** — tesis, arco narrativo y
-   los textos de las secciones que faltan
 
 Antes de proponer algo que parezca una mejora obvia, chequear DECISIONES.md:
 varias cosas que se ven raras son deliberadas y ya tienen un porqué escrito.
@@ -41,35 +37,34 @@ técnicos y los identificadores de código quedan en su forma original.
 **Commits:** infinitivo en español, sin prefijos tipo `feat:` ni `fix:`.
 Describen el efecto, no el archivo tocado.
 
-> Reemplazar el video del hero por la toma nueva
+> Vaciar el proyecto para empezar de nuevo
 > Documentar el flujo de 4K en Google Flow y el problema de los cuatro paneles
 
-**Los textos de la página van en inglés.** El código y la documentación en
-español; el copy que ve el visitante, en inglés. No traducir el copy.
+**Commits y push:** solo cuando se piden explícitamente.
+
+**Antes de borrar algo irreversible:** avisar qué no está en git y confirmar.
+El 2 de septiembre se perdieron seis clips crudos que estaban en
+`.gitignore`; fue una decisión tomada a conciencia, pero conviene que
+siempre lo sea.
 
 **Al cierre de cada sesión:** actualizar [ESTADO.md](ESTADO.md) — fecha,
-commit de referencia, estado del bloqueante y pendientes que se hayan movido.
-Si en la sesión se decidió algo con un porqué que no se deduce del código,
-agregarlo a [DECISIONES.md](DECISIONES.md).
-
-**Commits y push:** solo cuando se piden explícitamente.
+commit de referencia y qué cambió. Si se decidió algo con un porqué que no se
+deduce del código, agregarlo a [DECISIONES.md](DECISIONES.md).
 
 ---
 
 ## Reglas duras
 
-Estas no se discuten sin una conversación previa. El porqué de cada una está
-en [DECISIONES.md](DECISIONES.md).
+El porqué de cada una está en [DECISIONES.md](DECISIONES.md).
 
-- **Nada de overlays oscuros sobre el video.** El contraste se resuelve en el
-  texto, nunca oscureciendo la imagen.
-- **Todo video nuevo necesita el mismo tratamiento:** quitarle el audio y
-  armar el loop ping-pong. Sin eso, el loop salta.
-- **No escalar videos por nuestra cuenta.** El upscale se hace en Flow o no
-  se hace.
-- **`originales/` no entra al repo.** Está en `.gitignore` y ahí viven los
-  clips crudos.
-- **La sección 3 no dice "y triunfaste", dice "y otra vez".**
+- **Los videos no se commitean.** `public/video/` está en `.gitignore`: lo
+  que entra al historial se queda ahí para siempre, aunque después se borre.
+- **Todo video de fondo necesita tratamiento:** quitarle el audio y armar el
+  loop ping-pong. Sin eso, el loop salta.
+- **No escalar videos por cuenta propia.** El upscale se hace en el
+  generador o no se hace.
+- **El espacio en disco es limitado.** No dejar builds ni artefactos
+  acumulados; `node_modules` y `dist` se borran sin miedo y se regeneran.
 
 ---
 
@@ -78,15 +73,12 @@ en [DECISIONES.md](DECISIONES.md).
 - **Imports con alias `@/`** — `@/components/...`, `@/lib/utils`
 - **Componentes con `export function`**, no `export default`
   (la única excepción es `App.tsx`)
-- **Clases de Tailwind ordenadas** como las deja el formateador; para
-  combinarlas condicionalmente se usa el helper `cn()` de `@/lib/utils`
-- **Las tipografías se aplican inline** con `style={{ fontFamily }}` para
-  Instrument Serif, porque conviven con las clases de Tailwind
-- **Los blancos con opacidad** (`text-white/70`, `text-white/80`) reemplazan a
-  `muted-foreground` sobre el video — el gris del tema desaparece sobre las
-  nubes claras
-- **Listas de contenido como constantes arriba del componente**, en
-  mayúsculas — el patrón de `NAV_LINKS` en `Navigation.tsx`
+- **Clases de Tailwind** combinadas condicionalmente con el helper `cn()` de
+  `@/lib/utils`
+- **Las tipografías se aplican inline** con `style={{ fontFamily }}` cuando
+  conviven con clases de Tailwind
+- **Listas de contenido como constantes en mayúsculas** arriba del
+  componente, no incrustadas en el JSX
 
 ---
 
@@ -96,11 +88,6 @@ en [DECISIONES.md](DECISIONES.md).
 |---|---|---|
 | `src/` | El código de la página | Sí |
 | `notas/` | Estado, decisiones y este archivo | Sí |
-| `ideas/` | Identidad y componentes escritos pero no montados | Sí |
-| `originales/` | Clips crudos de Flow y versiones previas del hero | **No** |
-| `public/` | `video/hero.mp4`, `img/hero-poster.jpg`, favicon | Sí |
-| `dist/` | Build | **No** |
-
-Los componentes de `ideas/` (`Section.tsx` y `Story.tsx`) están terminados y
-esperando video. Para montarlos: moverlos a `src/components/` y agregar
-`<Story />` después del hero en `App.tsx`.
+| `public/` | Assets estáticos (hoy solo el favicon) | Sí |
+| `public/video/` | Videos | **No** |
+| `node_modules/`, `dist/` | Dependencias y build | **No** |
