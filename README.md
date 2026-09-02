@@ -109,13 +109,33 @@ El `trim=start_frame=1` evita que el fotograma del medio quede duplicado.
 
 ## Resolución del video
 
-El video es 1280x720 nativo, la resolución en la que se generó. No hay una
-versión de más calidad que recuperar: escalarlo a 4K solo inventaría píxeles,
-pesaría diez veces más y se vería más blando, no más nítido.
+Los videos se generan en **Google Flow (Veo)**, que entrega **1280x720**.
 
-Lo que sí se hizo: regenerarlo con CRF 15 (bitrate 2.780 kbps, por encima
-del original de 2.149) para que el ping-pong no agregue pérdida propia.
+### Cómo conseguir el 4K
 
-Si conseguís el clip en 4K desde donde lo generaste, traelo: se rehace el
-ping-pong desde ese archivo y se sirve a 1440p o 1080p, que es lo razonable
-para un video de fondo.
+El 4K no sale del generador: es un paso posterior de **"Upscale"** dentro de
+Flow, sobre el video ya generado. Dos cosas a tener en cuenta:
+
+1. **Suele estar atado al plan.** En AI Pro puede no aparecer; normalmente
+   requiere Ultra.
+2. **Al descargar hay que elegir la versión escalada.** Bajar desde la vista
+   previa da el 720p aunque el upscale se haya hecho.
+
+No escalar el 720p por nuestra cuenta: inventa píxeles, pesa diez veces más y
+se ve más blando, no más nítido.
+
+### El problema de los cuatro paneles
+
+Hay una causa de la baja definición más importante que la resolución global:
+la composición son **cuatro paneles verticales**, así que cada panel mide solo
+**310 px de ancho** y en pantalla se estira a 360 px o más.
+
+Al regenerar en Flow conviene pedir **una sola escena a pantalla completa** en
+lugar de paneles divididos. Los mismos 1280 px puestos en una sola imagen
+rinden cuatro veces más que repartidos en cuatro columnas.
+
+### Al traer un video nuevo
+
+Necesita siempre el mismo tratamiento: quitarle la pista de audio y armar el
+ping-pong (comando más abajo), porque las tomas de Flow terminan en un
+encuadre distinto al que arrancan y el loop directo salta.
