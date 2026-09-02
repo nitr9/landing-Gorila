@@ -16,7 +16,7 @@ export function Navigation() {
         className="shrink-0 text-3xl tracking-tight text-foreground"
         style={{ fontFamily: "'Instrument Serif', serif" }}
       >
-        Velorah<sup className="text-xs">®</sup>
+        NicoNT<sup className="text-xs">®</sup>
       </a>
 
       <div className="hidden flex-1 items-center justify-center gap-6 px-6 md:flex lg:gap-8">
