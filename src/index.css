@@ -8,8 +8,9 @@
     --font-display: 'Instrument Serif', serif;
     --font-body: 'Inter', sans-serif;
 
-    /* Tema oscuro */
-    --background: 201 100% 13%;
+    /* Verde del video, tal cual lo muestreamos: así el empalme entre
+       secciones es continuo y no hay salto de tono */
+    --background: 100 38% 22%;
     --foreground: 0 0% 100%;
 
     --card: 0 0% 4%;
@@ -29,6 +30,14 @@
 
     --accent: 0 0% 10%;
     --accent-foreground: 0 0% 100%;
+
+    /* Verde del video del cierre (93 28% 31%): más claro que --background.
+       Se usa solo en el empalme con esa sección, para que el degradado
+       llegue al tono del video y no al del fondo. */
+    --verde-cierre: 95 30% 25%;
+
+    /* Rojo de los auriculares: el unico acento de color */
+    --accent-red: 4 78% 52%;
 
     --destructive: 0 62% 30%;
     --destructive-foreground: 0 0% 100%;
@@ -125,4 +134,106 @@
   .animate-fade-rise-delay-2 {
     animation: none;
   }
+}
+
+
+/* ==========================================================
+   Foco suave
+   Luz cálida que entra desde la esquina superior izquierda.
+   Tiene que insinuarse, no verse: de ahí la opacidad baja y
+   el radio enorme. La respiración es de 12s para que no se
+   perciba como una animación.
+   ========================================================== */
+.foco-lateral {
+  position: absolute;
+  top: -30%;
+  left: -20%;
+  width: 75%;
+  height: 130%;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse at 30% 35%,
+    rgba(255, 248, 220, 0.4) 0%,
+    rgba(255, 242, 205, 0.24) 28%,
+    rgba(255, 236, 195, 0.11) 48%,
+    transparent 75%
+  );
+  mix-blend-mode: screen;
+  animation: respirar-foco 12s ease-in-out infinite;
+}
+
+@keyframes respirar-foco {
+  0%,
+  100% {
+    opacity: 0.8;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .foco-lateral {
+    animation: none;
+  }
+}
+
+
+/* Barras del botón del reproductor */
+@keyframes onda {
+  0%,
+  100% {
+    transform: scaleY(0.5);
+  }
+  50% {
+    transform: scaleY(1.4);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [class*='animate-[onda'] {
+    animation: none;
+  }
+}
+
+
+/* ==========================================================
+   Barra de volumen del reproductor
+   ========================================================== */
+.slider-volumen {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 2px;
+  border-radius: 2px;
+  cursor: pointer;
+  outline: none;
+}
+
+.slider-volumen::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.4);
+  transition: transform 0.2s ease;
+}
+
+.slider-volumen::-webkit-slider-thumb:hover {
+  transform: scale(1.3);
+}
+
+.slider-volumen::-moz-range-thumb {
+  width: 10px;
+  height: 10px;
+  border: none;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.4);
+}
+
+.slider-volumen:focus-visible {
+  outline: 1px solid hsl(var(--accent-red));
+  outline-offset: 6px;
 }

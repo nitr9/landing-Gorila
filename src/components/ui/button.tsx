@@ -15,6 +15,9 @@ const buttonVariants = cva(
         /* Variante propia: cristal líquido sobre el video */
         glass:
           'liquid-glass text-foreground rounded-full hover:scale-[1.03] [text-shadow:0_1px_4px_rgba(0,0,0,0.45)]',
+        /* Igual que glass pero con esquinas rectas */
+        'glass-square':
+          'liquid-glass text-foreground rounded-none hover:scale-[1.03] [text-shadow:0_1px_4px_rgba(0,0,0,0.45)]',
       },
       size: {
         default: 'h-10 px-4 py-2 text-sm',
@@ -23,6 +26,8 @@ const buttonVariants = cva(
         /* Medidas exactas del diseño */
         nav: 'px-6 py-2.5 text-sm',
         hero: 'px-14 py-5 text-base',
+        /* Mas angosto que hero, para CTA sobre fondo plano */
+        cta: 'px-8 py-3.5 text-sm',
       },
     },
     defaultVariants: {

@@ -33,9 +33,103 @@ y no atan el proyecto nuevo a ninguna estética.
 
 ---
 
+## Video y scroll: lo aprendido con el gorila
+
+### Ralentizar un video lo traba
+
+Ni `playbackRate = 0.7` ni estirar los tiempos con `setpts` generan
+fotogramas nuevos: estiran los que hay. Cada fotograma dura más en pantalla
+y el movimiento se ve a saltos, por más que el archivo diga 48 o 60 fps.
+
+**Regla:** si un clip tiene que ir más lento, se genera más lento en el
+origen. Un clip de 24 fps y 240 fotogramas no se puede estirar sin que se
+note.
+
+### `minterpolate` inventa fotogramas, pero deforma los bordes
+
+El filtro de interpolación de movimiento sí crea fotogramas intermedios, y
+funciona bien con movimiento continuo y previsible — el giro lento del
+gorila, por ejemplo.
+
+**Falla cuando algo entra rápido en cuadro:** no tiene información de dónde
+venía y deforma los píxeles. En el clip del producto, la mano que entra
+generaba artefactos visibles. Ahí hubo que sacarlo.
+
+### Scrubbing: controlar la velocidad, no saltar a un `currentTime`
+
+Buscar un tiempo exacto en cada evento de scroll obliga al navegador a
+decodificar de a saltos y ahí aparecen los tirones. Lo que funciona es
+dejar el video reproduciéndose y **modular `playbackRate`** según la
+distancia al objetivo: rápido si falta mucho, frenando al acercarse, en
+pausa al llegar. El decodificador trabaja en secuencia, que es lo que sabe
+hacer.
+
+Hacia atrás no hay reproducción posible: ahí sí hay que saltar, pero de a
+pasos cortos (18% de la distancia) para que no se note.
+
+Requisito del archivo: **keyframe cada 2 frames** (`-g 2 -keyint_min 2
+-sc_threshold 0`). Sin eso, cualquier método da tirones.
+
+### El poster es el primer fotograma, no el último
+
+Si el video arranca al entrar en pantalla, el poster tiene que coincidir con
+su primer fotograma. Con el último, se ve la escena terminada un instante y
+después el video "vuelve a empezar" — parece un bug y no lo es.
+
+---
+
+## Fusionar secciones sin costura
+
+El objetivo era que las cuatro secciones se leyeran como una sola pieza. Lo
+que funcionó:
+
+1. **Ninguna sección lleva fondo propio:** todas heredan el verde del body.
+2. **El color del fondo sale de muestrear el video**, no de elegirlo a ojo.
+3. **Los bordes de cada video se funden** con degradados hacia el fondo.
+
+### Toda capa que corta en seco deja una línea
+
+Esta fue la causa de casi todos los cortes visibles, y costó verla porque el
+síntoma aparece lejos de la causa:
+
+- El degradado lateral del hero llegaba hasta el piso → su borde se sumaba
+  al del video. Se arregla con una máscara que lo apaga antes.
+- El velo `bg-black/25` del `ScrollStory` terminaba con el bloque `sticky` →
+  línea horizontal a media pantalla. Misma solución.
+- Una sección con fondo opaco y `z-index` mayor tapa el degradado de la
+  anterior y lo anula por completo.
+
+**Regla:** si una capa se superpone a un video, tiene que desvanecerse antes
+de su propio borde.
+
+### Un color plano no empalma con un fondo viñeteado
+
+El video del cierre tiene el fondo más claro en el centro (34%) que en los
+bordes (30%). Ningún color sólido puede coincidir con las dos zonas, así que
+siempre quedaba escalón en alguna.
+
+**La solución no es afinar el color:** es enmascarar el borde del propio
+video para que se disuelva sobre lo que haya detrás, sea cual sea su tono.
+
+---
+
+## Spotify no sirve si se quiere ocultar la interfaz
+
+El iframe de Spotify no se puede controlar por JavaScript (política de
+origen cruzado), así que oculto no hay forma de darle play — requiere que la
+persona apriete su botón, dentro del iframe.
+
+Por eso el reproductor usa **audio local**: las barras además reaccionan al
+sonido real con `AnalyserNode`, en vez de animarse por CSS.
+
+El `AudioContext` necesita un gesto del usuario, así que el analizador se
+crea recién en el primer play, no al montar el componente.
+
+---
+
 ## Los videos no se commitean
 
-**Regla:** `public/video/` está en `.gitignore`, igual que `originales/`.
+**Regla:** `public/video/` y `public/audio/` están en `.gitignore`.
 
 **Por qué:** cada versión de un video que se commitea queda **para siempre**
 en el historial de git, aunque después se borre el archivo. Así fue como

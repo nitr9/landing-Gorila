@@ -1,7 +1,33 @@
+import { Cierre } from '@/components/Cierre'
+import { Hero } from '@/components/Hero'
+import { Interludio } from '@/components/Interludio'
+import { Logo } from '@/components/Logo'
+import { Navigation } from '@/components/Navigation'
+import { Reproductor } from '@/components/Reproductor'
+import { ScrollStory } from '@/components/ScrollStory'
+import { Transicion } from '@/components/Transicion'
+import { VideoPanel } from '@/components/VideoPanel'
+
 function App() {
   return (
-    <main className="flex min-h-screen w-full items-center justify-center bg-background">
-      <p className="text-sm text-muted-foreground">Proyecto nuevo</p>
+    <main className="relative w-full bg-background">
+      {/* El hero es la única sección con su propio video de fondo; el resto
+          hereda el verde del body para que no haya costura entre bloques. */}
+      <section className="relative min-h-screen w-full overflow-hidden bg-background">
+        <VideoPanel />
+        <Logo />
+        <Navigation />
+        <Hero />
+      </section>
+
+      <Interludio />
+      <ScrollStory />
+
+      <Transicion />
+
+      <Cierre />
+
+      <Reproductor />
     </main>
   )
 }

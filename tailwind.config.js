@@ -12,6 +12,8 @@ export default {
         background: 'hsl(var(--background))',
         foreground: 'hsl(var(--foreground))',
         border: 'hsl(var(--border))',
+        'accent-red': 'hsl(var(--accent-red))',
+        'verde-cierre': 'hsl(var(--verde-cierre))',
         input: 'hsl(var(--input))',
         ring: 'hsl(var(--ring))',
         primary: {

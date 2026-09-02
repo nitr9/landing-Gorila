@@ -1,10 +1,10 @@
 # Estado del proyecto
 
 **Última actualización:** 2 de septiembre de 2026
-**Rama:** `master` · último commit: `52ae656`
+**Rama:** `master`
 
-Dónde estamos hoy: qué está bloqueando y qué sigue. Es lo único de `notas/`
-que cambia cada sesión.
+Dónde estamos hoy: qué está listo y qué sigue. Es lo único de `notas/` que
+cambia cada sesión.
 
 - [CONTEXTO.md](CONTEXTO.md) — cómo trabajamos y qué leer primero
 - [DECISIONES.md](DECISIONES.md) — por qué las cosas son como son
@@ -12,58 +12,64 @@ que cambia cada sesión.
 
 ---
 
-## Punto de partida
+## Qué es
 
-El proyecto está **vacío y listo para empezar**. La landing anterior se
-descartó por completo el 2 de septiembre de 2026.
+Landing de **NT®**, una marca ficticia de auriculares. Es un ejercicio de
+diseño y de marca personal: no hay producto real detrás.
 
-Lo que hay en pantalla hoy: una página en blanco con el texto "Proyecto
-nuevo". Typecheck y build verificados.
+El recorrido son cuatro bloques encadenados sin costura visible, todos sobre
+el mismo verde:
+
+| # | Sección | Qué pasa |
+|---|---|---|
+| 1 | `VideoPanel` + `Hero` | Gorila de perfil en loop, texto a la izquierda |
+| 2 | `Interludio` | Respiración: "No es la ausencia de sonido" |
+| 3 | `ScrollStory` | El scroll controla el giro del gorila; tres frases alternan izquierda/derecha |
+| 4 | `Transicion` + `Cierre` | Puente y remate: los auriculares se posan en el soporte |
+
+Más el `Reproductor` fijo abajo a la izquierda: siete barras que reaccionan
+al audio real, con control de volumen que aparece al reproducir.
 
 ```bash
-npm install     # una sola vez
+npm install
 npm run dev     # → http://localhost:5173
 ```
 
 ---
 
-## Lo que sigue: definir el proyecto nuevo
+## Lo que falta
 
-**Nada está decidido todavía.** Falta definir de qué se trata la página:
-tema, tipo de sitio, tono y si sigue siendo una landing de una sola página.
-
-Hasta que eso esté, no hay nada que construir.
-
----
-
-## Lo que quedó como base
-
-Andamiaje funcionando, sin contenido:
-
-| Qué | Dónde |
-|---|---|
-| Vite + TypeScript + Tailwind configurados | raíz |
-| Tema y variables de color | `src/index.css` |
-| Botón shadcn con variante `glass` | `src/components/ui/button.tsx` |
-| Helper `cn()` | `src/lib/utils.ts` |
-| App mínima | `src/App.tsx` |
-
-El botón con variante glass y el tema vienen del proyecto anterior. Se
-conservan porque son reusables, pero **no condicionan nada**: si el enfoque
-nuevo pide otra estética, se cambian sin culpa.
+- [ ] **Los links no llevan a ningún lado.** `Sonido`, `Diseño` y `Acerca de`
+      apuntan a `#`, igual que los dos botones "Explorar audífonos".
+- [ ] **No hay menú móvil.** La navegación se oculta bajo `sm:` y el
+      reproductor bajo `sm:` también.
+- [ ] **El scrubbing está desactivado en móvil** (queda el poster fijo). Es
+      deliberado —en un teléfono iría a los saltos— pero se podría resolver
+      con una secuencia de imágenes.
+- [ ] Imagen Open Graph para redes.
+- [ ] El `<title>` dice "Vanta — Serie 01", de una versión anterior del copy.
 
 ---
 
 ## Pendiente técnico
 
-- [ ] **Los 22 MB de `.git`** son los videos del proyecto viejo, que quedaron
-      en el historial. Se recuperan reescribiendo el historial, pero eso
-      destruye el punto de retorno (`7ea9351`). Hacerlo cuando ya no haga
-      falta consultar lo anterior.
+- [ ] **`.git` pesa ~22 MB** por los videos del proyecto anterior, que
+      quedaron en el historial. Se recuperan reescribiéndolo, pero eso
+      destruye el punto de retorno (`7ea9351`).
 
 ---
 
-## Por qué las cosas son como son
+## Los archivos pesados no están en el repo
 
-Las decisiones tomadas y lo que ya se probó sin éxito están en
-[notas/DECISIONES.md](DECISIONES.md).
+`public/video/` y `public/audio/` están en `.gitignore`. Al clonar, la
+página carga pero **sin videos ni música**. Los originales están en la
+carpeta de Descargas de Nico:
+
+| Archivo del proyecto | Origen |
+|---|---|
+| `video/gorila.mp4` | `Gorila_gira_la_cabeza_1080p_*.mp4` |
+| `video/gorila-scroll.mp4` | `Gorila_ajustando_audífonos_rojos_1080p_*.mp4` |
+| `video/producto.mp4` | `Gorilla_places_red_wireless_head…*.mp4` |
+| `audio/ambiente.mp3` | `wav-session-22--old-school-hip-hop-mix--20-tracks.mp3` |
+
+El tratamiento de cada uno está en [DECISIONES.md](DECISIONES.md).
