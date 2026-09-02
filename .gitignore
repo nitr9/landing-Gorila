@@ -1,0 +1,13 @@
+node_modules
+dist
+dist-ssr
+*.local
+.DS_Store
+.vite
+.gstack/
+
+# archivos fuente originales (no van al deploy)
+originales
+
+# build info de TypeScript
+*.tsbuildinfo
