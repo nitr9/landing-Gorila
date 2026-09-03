@@ -47,17 +47,37 @@ export function ScrollStory() {
   const videoRef = useRef<HTMLVideoElement>(null)
   const [progreso, setProgreso] = useState(0)
 
+  // El video pesa: se empieza a cargar recién cuando el bloque se acerca,
+  // no al entrar a la página. Con preload="auto" se descargaban 17 MB
+  // aunque nadie llegara hasta acá.
   useEffect(() => {
     const contenedor = contenedorRef.current
     const video = videoRef.current
     if (!contenedor || !video) return
 
-    // En pantallas chicas el scrubbing no rinde: se deja el poster.
-    const esChica = window.matchMedia('(max-width: 767px)')
-    if (esChica.matches) return
+    const precarga = new IntersectionObserver(
+      ([entrada]) => {
+        if (!entrada.isIntersecting) return
+        video.preload = 'auto'
+        video.load()
+        precarga.disconnect()
+      },
+      { rootMargin: '150% 0px' }
+    )
+    precarga.observe(contenedor)
+    return () => precarga.disconnect()
+  }, [])
 
+  useEffect(() => {
+    const contenedor = contenedorRef.current
+    const video = videoRef.current
+    if (!contenedor || !video) return
+
+    // En pantallas chicas el scrubbing no rinde: se deja el poster. Igual
+    // con quien pidió menos movimiento.
+    const esChica = window.matchMedia('(max-width: 767px)')
     const sinMovimiento = window.matchMedia('(prefers-reduced-motion: reduce)')
-    if (sinMovimiento.matches) return
+    if (esChica.matches || sinMovimiento.matches) return
 
     let frameId = 0
     let objetivo = 0
@@ -70,7 +90,17 @@ export function ScrollStory() {
 
       const p = Math.min(Math.max(-rect.top / recorrido, 0), 1)
       objetivo = p
-      setProgreso(p)
+      // Solo se re-renderiza si cambió qué frase está visible: actualizar el
+      // estado en cada píxel de scroll dispara un render de React por evento.
+      setProgreso((previo) =>
+        PASOS.some(
+          (paso) =>
+            Math.abs(previo - paso.at) < VENTANA !==
+            (Math.abs(p - paso.at) < VENTANA)
+        )
+          ? p
+          : previo
+      )
 
       if (!frameId) frameId = requestAnimationFrame(animar)
     }
@@ -94,8 +124,12 @@ export function ScrollStory() {
       const delta = objetivo - actual
 
       if (Math.abs(delta) < 0.002) {
-        // Llegó: se congela en el fotograma pedido.
+        // Llegó: se congela y se corta el loop. Sin esto el
+        // requestAnimationFrame sigue corriendo a 60fps para siempre,
+        // aunque nadie esté scrolleando.
         if (!video.paused) video.pause()
+        frameId = 0
+        return
       } else if (delta > 0) {
         // Hacia adelante: la velocidad acompaña la distancia que falta.
         video.playbackRate = Math.min(Math.max(Math.abs(delta) * 16, 0.5), 4)
@@ -129,7 +163,7 @@ export function ScrollStory() {
           ref={videoRef}
           muted
           playsInline
-          preload="auto"
+          preload="none"
           poster={POSTER_SRC}
           className="absolute inset-0 h-full w-full object-cover"
         >

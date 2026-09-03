@@ -16,6 +16,7 @@ export function Reproductor() {
   const audioRef = useRef<HTMLAudioElement>(null)
   const barrasRef = useRef<Array<HTMLSpanElement | null>>([])
   const analizadorRef = useRef<AnalyserNode | null>(null)
+  const ctxRef = useRef<AudioContext | null>(null)
   const frameRef = useRef(0)
 
   const [sonando, setSonando] = useState(false)
@@ -40,13 +41,21 @@ export function Reproductor() {
     fuente.connect(analizador)
     analizador.connect(ctx.destination)
     analizadorRef.current = analizador
+    ctxRef.current = ctx
   }
+
+  // Se reutiliza el buffer: crear un Uint8Array por frame (60 por segundo)
+  // genera basura innecesaria para el recolector.
+  const datosRef = useRef<Uint8Array<ArrayBuffer> | null>(null)
 
   const animar = () => {
     const analizador = analizadorRef.current
     if (!analizador) return
 
-    const datos = new Uint8Array(analizador.frequencyBinCount)
+    if (!datosRef.current || datosRef.current.length !== analizador.frequencyBinCount) {
+      datosRef.current = new Uint8Array(analizador.frequencyBinCount)
+    }
+    const datos = datosRef.current
     analizador.getByteFrequencyData(datos)
 
     barrasRef.current.forEach((barra, i) => {
@@ -73,6 +82,9 @@ export function Reproductor() {
         .play()
         .then(() => {
           setSonando(true)
+          // Cancelar antes de pedir uno nuevo: dos clics rápidos dejarían
+          // dos loops corriendo en paralelo.
+          cancelAnimationFrame(frameRef.current)
           frameRef.current = requestAnimationFrame(animar)
         })
         .catch(() => setHayAudio(false))
@@ -90,7 +102,39 @@ export function Reproductor() {
     if (audioRef.current) audioRef.current.volume = volumen
   }, [volumen])
 
-  useEffect(() => () => cancelAnimationFrame(frameRef.current), [])
+  // Si el audio se detiene por cualquier vía (fin de pista, error, el
+  // sistema lo pausa), hay que reflejarlo y frenar la animación: si no, las
+  // barras siguen corriendo contra un audio detenido.
+  useEffect(() => {
+    const audio = audioRef.current
+    if (!audio) return
+
+    const alDetenerse = () => {
+      setSonando(false)
+      cancelAnimationFrame(frameRef.current)
+      frameRef.current = 0
+      barrasRef.current.forEach((b) => {
+        if (b) b.style.transform = 'scaleY(0.25)'
+      })
+    }
+
+    audio.addEventListener('pause', alDetenerse)
+    audio.addEventListener('ended', alDetenerse)
+    return () => {
+      audio.removeEventListener('pause', alDetenerse)
+      audio.removeEventListener('ended', alDetenerse)
+    }
+  }, [])
+
+  // Al desmontar: frenar la animación y cerrar el AudioContext, que si no
+  // queda vivo consumiendo recursos.
+  useEffect(
+    () => () => {
+      cancelAnimationFrame(frameRef.current)
+      void ctxRef.current?.close()
+    },
+    []
+  )
 
   if (!hayAudio) return null
 

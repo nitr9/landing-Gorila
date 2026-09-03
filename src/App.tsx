@@ -13,7 +13,7 @@ function App() {
     <main className="relative w-full bg-background">
       {/* El hero es la única sección con su propio video de fondo; el resto
           hereda el verde del body para que no haya costura entre bloques. */}
-      <section className="relative min-h-screen w-full overflow-hidden bg-background">
+      <section id="inicio" className="relative min-h-screen w-full overflow-hidden bg-background">
         <VideoPanel />
         <Logo />
         <Navigation />

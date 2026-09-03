@@ -46,8 +46,8 @@ npm run dev     # → http://localhost:5173
 - [ ] **El scrubbing está desactivado en móvil** (queda el poster fijo). Es
       deliberado —en un teléfono iría a los saltos— pero se podría resolver
       con una secuencia de imágenes.
-- [ ] Imagen Open Graph para redes.
-- [ ] El `<title>` dice "Vanta — Serie 01", de una versión anterior del copy.
+- [x] ~~Imagen Open Graph~~ — usa el poster del hero.
+- [x] ~~El `<title>` decía "Vanta — Serie 01"~~ — corregido, con Open Graph.
 
 ---
 

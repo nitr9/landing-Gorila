@@ -26,15 +26,32 @@ export function Cierre() {
     video.muted = true
     video.defaultMuted = true
 
+    // Se empieza a bajar el video antes de que la sección entre, para que
+    // esté listo al llegar, pero no en la carga inicial de la página.
+    const precarga = new IntersectionObserver(
+      ([entrada]) => {
+        if (!entrada.isIntersecting) return
+        video.preload = 'auto'
+        video.load()
+        precarga.disconnect()
+      },
+      { rootMargin: '120% 0px' }
+    )
+    precarga.observe(seccion)
+
     const observador = new IntersectionObserver(
       ([entrada]) => {
         if (!entrada.isIntersecting) return
 
         setVisible(true)
-        // La lentitud viene del archivo (interpolado a 60fps y alargado),
-        // no de playbackRate: bajarlo por JS reproduce menos fotogramas por
-        // segundo y ahí aparecen los tirones.
-        video.play().catch(() => {})
+
+        // Quien pidió menos movimiento ve el último fotograma en vez de la
+        // animación completa.
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+          video.currentTime = video.duration || 0
+        } else {
+          video.play().catch(() => {})
+        }
         // Una sola vez: cumplido su trabajo, deja de observar.
         observador.disconnect()
       },
@@ -42,7 +59,10 @@ export function Cierre() {
     )
 
     observador.observe(seccion)
-    return () => observador.disconnect()
+    return () => {
+      observador.disconnect()
+      precarga.disconnect()
+    }
   }, [])
 
   return (
@@ -54,7 +74,7 @@ export function Cierre() {
         ref={videoRef}
         muted
         playsInline
-        preload="auto"
+        preload="none"
         poster={POSTER_SRC}
         className="absolute inset-0 h-full w-full object-cover"
         style={{

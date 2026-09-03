@@ -5,7 +5,8 @@
 export function Logo() {
   return (
     <a
-      href="#"
+      href="#inicio"
+      aria-label="NT, ir al inicio"
       className="animate-fade-rise absolute left-8 top-8 z-20 text-3xl tracking-tight text-accent-red md:left-16 lg:left-24"
       style={{ fontFamily: "'Instrument Serif', serif" }}
     >

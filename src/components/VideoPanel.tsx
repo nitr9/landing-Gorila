@@ -24,14 +24,18 @@ export function VideoPanel() {
     video.defaultMuted = true
 
     const play = () => video.play().catch(() => {})
-    play()
 
     const retry = () => {
       video.muted = true
       play()
     }
-    document.addEventListener('click', retry, { once: true })
-    document.addEventListener('touchstart', retry, { once: true })
+
+    // Solo se arma el reintento si el autoplay falló: si el video ya está
+    // corriendo, no hace falta escuchar la primera interacción.
+    video.play().catch(() => {
+      document.addEventListener('click', retry, { once: true })
+      document.addEventListener('touchstart', retry, { once: true })
+    })
 
     return () => {
       document.removeEventListener('click', retry)
