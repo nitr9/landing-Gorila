@@ -237,3 +237,159 @@
   outline: 1px solid hsl(var(--accent-red));
   outline-offset: 6px;
 }
+
+
+/* ==========================================================
+   Estelas de luz (light trails)
+   El rastro que dejan los faros en una foto de larga
+   exposición: líneas finas y continuas, no un haz difuso.
+
+   Cada estela es una línea con la cabeza más brillante y una
+   cola que se desvanece. Cruzan a distinta altura, velocidad
+   y color (blanco cálido de faros, rojo de las luces
+   traseras) para que no se lea el patrón.
+   ========================================================== */
+.estelas {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.estela {
+  position: absolute;
+  left: 0;
+  height: 2px;
+  border-radius: 999px;
+  transform: translateX(-40vw);
+  opacity: 0;
+  /* La máscara disuelve la cola: sin esto el box-shadow y el propio borde
+     del elemento cortan en seco y se ve dónde termina la línea. */
+  -webkit-mask-image: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(0, 0, 0, 0.15) 30%,
+    rgba(0, 0, 0, 0.6) 62%,
+    #000 88%
+  );
+  mask-image: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(0, 0, 0, 0.15) 30%,
+    rgba(0, 0, 0, 0.6) 62%,
+    #000 88%
+  );
+  /* Capa propia en el compositor: el desplazamiento no depende del hilo
+     principal, así el cruce sigue fluido aunque JS esté ocupado. */
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+  contain: layout style paint;
+}
+
+/* La cabeza de la estela: un punto de luz que la antecede */
+.estela::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 50%;
+  width: 7px;
+  height: 7px;
+  margin-top: -3.5px;
+  border-radius: 50%;
+  background: currentColor;
+  /* Dos halos: uno cerrado e intenso, otro amplio y tenue. Un solo
+     box-shadow se lee como un círculo con borde; dos dan la difusión de
+     una luz real. */
+  box-shadow:
+    0 0 10px 2px currentColor,
+    0 0 26px 6px currentColor;
+}
+
+/* Blanco cálido: faros que se acercan */
+.estela--faro {
+  color: rgba(255, 246, 220, 0.9);
+  background: linear-gradient(
+    90deg,
+    rgba(255, 246, 220, 0) 0%,
+    rgba(255, 246, 220, 0.006) 18%,
+    rgba(255, 246, 220, 0.02) 34%,
+    rgba(255, 247, 224, 0.05) 48%,
+    rgba(255, 248, 228, 0.11) 60%,
+    rgba(255, 249, 230, 0.22) 72%,
+    rgba(255, 250, 234, 0.4) 83%,
+    rgba(255, 252, 240, 0.66) 92%,
+    rgba(255, 253, 245, 0.95) 100%
+  );
+  box-shadow: 0 0 14px rgba(255, 245, 210, 0.35);
+}
+
+/* Rojo: luces traseras que se alejan */
+.estela--trasera {
+  color: hsl(var(--accent-red) / 0.85);
+  background: linear-gradient(
+    90deg,
+    hsl(var(--accent-red) / 0) 0%,
+    hsl(var(--accent-red) / 0.005) 18%,
+    hsl(var(--accent-red) / 0.018) 34%,
+    hsl(var(--accent-red) / 0.045) 48%,
+    hsl(var(--accent-red) / 0.09) 60%,
+    hsl(var(--accent-red) / 0.18) 72%,
+    hsl(var(--accent-red) / 0.33) 83%,
+    hsl(var(--accent-red) / 0.55) 92%,
+    hsl(var(--accent-red) / 0.8) 100%
+  );
+  box-shadow: 0 0 14px hsl(var(--accent-red) / 0.3);
+}
+
+@keyframes estela-pasar {
+  0% {
+    transform: translateX(-40vw);
+    opacity: 0;
+  }
+  6% {
+    opacity: 1;
+  }
+  70% {
+    opacity: 1;
+  }
+  85% {
+    transform: translateX(145vw);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(145vw);
+    opacity: 0;
+  }
+}
+
+/* Vibración con la música.
+   --pulso lo escribe JS en cada frame (0 a 1) leyendo los graves. El
+   desplazamiento lo sigue haciendo la animación CSS: acá solo se modula el
+   grosor, el brillo y un temblor vertical mínimo. */
+.estelas--vibrando .estela {
+  height: calc(2px + var(--pulso, 0) * 5px);
+  filter: brightness(calc(1 + var(--pulso, 0) * 1.6))
+    saturate(calc(1 + var(--pulso, 0) * 0.6));
+  /* --sacudida la escribe JS por estela, con signo alterno: unas suben y
+     otras bajan en el mismo golpe, que es lo que se lee como temblor. */
+  translate: 0 calc(var(--sacudida, 0) * 1px);
+  scale: calc(1 + var(--pulso, 0) * 0.03) 1;
+}
+
+/* La punta es lo que más marca el golpe: crece, se enciende y expande su
+   halo. Es el elemento con más presencia visual de la estela. */
+.estelas--vibrando .estela::after {
+  width: calc(4px + var(--pulso, 0) * 14px);
+  height: calc(4px + var(--pulso, 0) * 14px);
+  margin-top: calc(-2px - var(--pulso, 0) * 7px);
+  box-shadow: 0 0 calc(12px + var(--pulso, 0) * 55px)
+    calc(3px + var(--pulso, 0) * 12px) currentColor;
+  filter: brightness(calc(1 + var(--pulso, 0) * 2));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .estela {
+    animation: none !important;
+    opacity: 0;
+  }
+}

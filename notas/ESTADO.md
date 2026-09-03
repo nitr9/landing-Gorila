@@ -27,8 +27,15 @@ el mismo verde:
 | 3 | `ScrollStory` | El scroll controla el giro del gorila; tres frases alternan izquierda/derecha |
 | 4 | `Transicion` + `Cierre` | Puente y remate: los auriculares se posan en el soporte |
 
-Más el `Reproductor` fijo abajo a la izquierda: siete barras que reaccionan
-al audio real, con control de volumen que aparece al reproducir.
+La transición lleva **estelas de luz** cruzando el fondo —el rastro de los
+faros en una foto de larga exposición— que tiemblan con el golpe de la
+batería cuando hay música. Su frase se arma letra por letra desde abajo, con
+`TextAnimate` (`calmInUp`).
+
+Y el `Reproductor` fijo abajo a la izquierda: siete barras que reaccionan al
+audio real, con control de volumen que aparece al reproducir. Es el único
+que crea el `AudioContext`; las estelas leen su análisis por contexto
+(`src/lib/audio.tsx`).
 
 ```bash
 npm install
@@ -47,6 +54,8 @@ npm run dev     # → http://localhost:5173
       deliberado —en un teléfono iría a los saltos— pero se podría resolver
       con una secuencia de imágenes.
 - [x] ~~Imagen Open Graph~~ — usa el poster del hero.
+- [ ] El interludio (sección 2) no tiene animación de entrada. El hook
+      [useEnVista](../src/lib/useEnVista.ts) está listo para eso.
 - [x] ~~El `<title>` decía "Vanta — Serie 01"~~ — corregido, con Open Graph.
 
 ---

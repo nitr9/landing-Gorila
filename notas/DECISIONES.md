@@ -113,6 +113,55 @@ video para que se disuelva sobre lo que haya detrás, sea cual sea su tono.
 
 ---
 
+## Verificar en el navegador, no en el compilador
+
+Una animación quedó "arreglada" tres veces seguidas sin estarlo. El typecheck
+y el build pasaban limpios en cada intento, pero el efecto no corría.
+
+**Dos causas se sumaron:**
+
+1. Un script de reemplazo de texto no encontró el patrón, **no cambió nada y
+   aun así reportó éxito**. Confiar en esa salida hizo perder varios ciclos.
+2. Que un componente compile no dice nada sobre si su animación se ve.
+
+**Qué hacer en su lugar:** para cualquier cosa visual o de comportamiento,
+abrir la página en un navegador real y medir. Con Playwright alcanza:
+
+```js
+const t1 = await el.evaluate((e) => getComputedStyle(e).transform)
+// ... esperar ...
+const t2 = await el.evaluate((e) => getComputedStyle(e).transform)
+```
+
+Si los valores son iguales, no animó. También sirven las capturas en
+distintos momentos de la secuencia.
+
+**Y al editar:** preferir herramientas que fallen ruidosamente cuando el
+patrón no coincide, en vez de scripts que devuelven éxito igual.
+
+---
+
+## TextAnimate: qué hubo que cambiarle
+
+El componente de cult-ui (`motion`, no `framer-motion`) sirve, pero tal como
+viene no funcionaba acá:
+
+- **Animaba al montar**, así que en una sección a mitad de página el efecto
+  ya había ocurrido cuando se llegaba. Ahora dispara con `useInView`.
+- **Traía tipografía y colores fijos** (`font-black`, `text-black`) ajenos al
+  proyecto. Se sacaron para que las clases las ponga quien lo usa.
+- **El recorte fallaba con más de una línea.** Las variantes que suben desde
+  abajo (`calmInUp`, `whipInUp`, `shiftInUp`) mueven las letras con
+  `y: '200%'` y dependen de un único `overflow: hidden` en el contenedor. Con
+  texto en dos líneas eso no recorta bien y las letras quedan desplazadas en
+  vez de emerger: **cada letra necesita su propia máscara**.
+
+El registro de cult-ui está detrás de un checkpoint de Vercel que devuelve
+429 a peticiones automatizadas, así que el CLI de shadcn no puede bajarlo:
+hay que traer el JSON desde el navegador.
+
+---
+
 ## Spotify no sirve si se quiere ocultar la interfaz
 
 El iframe de Spotify no se puede controlar por JavaScript (política de

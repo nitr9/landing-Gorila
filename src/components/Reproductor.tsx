@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 
+import { useAudio } from '@/lib/audio'
+
 /**
  * Reproductor propio: las ondas son toda la interfaz.
  *
@@ -19,7 +21,7 @@ export function Reproductor() {
   const ctxRef = useRef<AudioContext | null>(null)
   const frameRef = useRef(0)
 
-  const [sonando, setSonando] = useState(false)
+  const { sonando, setSonando, registrarAnalizador } = useAudio()
   const [volumen, setVolumen] = useState(VOLUMEN_INICIAL)
   const [hayAudio, setHayAudio] = useState(true)
 
@@ -42,6 +44,8 @@ export function Reproductor() {
     analizador.connect(ctx.destination)
     analizadorRef.current = analizador
     ctxRef.current = ctx
+    // Las estelas leen de este mismo nodo para vibrar con la música.
+    registrarAnalizador(analizador)
   }
 
   // Se reutiliza el buffer: crear un Uint8Array por frame (60 por segundo)
@@ -131,9 +135,10 @@ export function Reproductor() {
   useEffect(
     () => () => {
       cancelAnimationFrame(frameRef.current)
+      registrarAnalizador(null)
       void ctxRef.current?.close()
     },
-    []
+    [registrarAnalizador]
   )
 
   if (!hayAudio) return null
