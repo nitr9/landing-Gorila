@@ -255,3 +255,89 @@ contraste sin tocarla.
 | Recortar paneles de un video como imágenes de sección | 310 px de ancho: blando a media pantalla, pixelado a pantalla completa |
 | `muted-foreground` para texto sobre imagen clara | El gris del tema desaparece sobre las zonas brillantes |
 | Escalar un 720p localmente | Inventa píxeles, pesa mucho más, se ve más blando |
+
+---
+
+## Seguridad: no hay nada que cubrir, y eso es una consecuencia
+
+**Cuándo:** 3 de septiembre de 2026.
+
+Se hizo un repaso de seguridad sobre el código y **no apareció nada**. Vale
+anotar la distinción, porque cambia qué tiene sentido hacer: no es que el
+código esté bien defendido, es que **no tiene las superficies donde
+normalmente se ponen las defensas**.
+
+Lo verificado, todo limpio:
+
+| Qué se buscó | Resultado |
+|---|---|
+| Sinks de XSS (`dangerouslySetInnerHTML`, `innerHTML`, `eval`…) | Ninguno |
+| Secretos, claves, tokens, `VITE_`, archivos `.env` | Ninguno, tampoco en el historial |
+| Llamadas de red (`fetch`, `axios`, WebSocket, `sendBeacon`) | Ninguna |
+| Almacenamiento (`localStorage`, `sessionStorage`) y `postMessage` | Ninguno |
+| SDKs de API en dependencias | Ninguno |
+| `npm audit` (producción y desarrollo) | 0 vulnerabilidades |
+| `favicon.svg` | Solo formas, sin `<script>` embebido |
+
+**Por qué sale así:** la landing es estática. Sin backend, sin formularios,
+sin sesiones, sin datos de usuario. Quien descargue el sitio entero obtiene
+lo mismo que ve cualquier visitante. Los vectores clásicos —inyección,
+robo de sesión, escalada de privilegios, filtración de claves— no tienen
+dónde apoyarse.
+
+**La consecuencia práctica:** esta cobertura **no es permanente, depende de
+que la landing siga siendo estática**. El día que entre un formulario de
+contacto, una lista de espera, analítica o un embed de terceros, aparecen de
+golpe categorías de riesgo que hoy no existen — y ahí hay que revisar de
+nuevo. Ojo con Vite en particular: cualquier variable con prefijo `VITE_`
+queda incrustada en el JavaScript público y es visible para cualquiera.
+
+### Lo que se decidió NO hacer
+
+Suenan a seguridad y no aportan nada acá:
+
+- **Ofuscar el JavaScript.** El código del cliente es público por diseño;
+  solo dificulta el propio depurado.
+- **Bloquear clic derecho o herramientas de desarrollo.** No detiene a
+  nadie y perjudica la accesibilidad.
+- **Agregar DOMPurify o similar.** No hay una sola entrada de usuario que
+  sanitizar. Sumar dependencias sin una amenaza concreta **amplía** la
+  superficie de ataque en vez de reducirla.
+
+**Regla:** el refuerzo se justifica contra una amenaza concreta. Sin eso, es
+peso muerto que hay que mantener.
+
+---
+
+## El deploy sube `dist` a mano, no se conecta el repo
+
+**Cuándo:** 10 de septiembre de 2026.
+
+**Qué se hizo:** la landing se publicó en Netlify, en
+https://landing-gorila.netlify.app (proyecto `landing-gorila`, equipo
+Nicolas). El deploy es manual: `npm run build` y después
+`npx netlify deploy --prod --dir=dist`.
+
+**Por qué manual y no automático desde GitHub:** `public/video/` y
+`public/audio/` están en `.gitignore` y suman 38 MB, así que no viven en el
+repo. Si Netlify construyera desde GitHub, la landing saldría sin video ni
+audio: el build funcionaría y el resultado estaría roto. Subir el `dist`
+armado en local es lo único que garantiza que el material pesado llegue.
+
+**Qué se descartó:**
+
+- **Commitear el video y el audio.** Son 38 MB que quedarían para siempre en
+  el historial de Git, encima de los ~22 MB que `.git` ya arrastra del
+  proyecto anterior.
+- **Git LFS.** Resuelve el peso, pero hay que configurarlo en el repo y en
+  Netlify, y consume cuota de ancho de banda de GitHub.
+
+**El costo de esto:** los pushes a GitHub no actualizan el sitio. Cada
+cambio necesita build local y deploy a mano. Si eso llega a molestar, la
+salida no es commitear el media: es moverlo a un CDN externo (Cloudinary,
+Bunny) y recién entonces conectar el repo.
+
+**Sobre las cabeceras de seguridad:** quedaron pendientes en la auditoría
+del 3 de septiembre porque dependían de dónde se publicara. Ya se sabe
+dónde, así que ahora se pueden escribir en `netlify.toml` — todavía no se
+hizo.

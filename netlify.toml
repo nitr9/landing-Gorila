@@ -1,0 +1,36 @@
+# El deploy es manual: `npm run build` y despues
+# `npx netlify deploy --prod --dir=dist`.
+# El repo NO esta conectado a Netlify, porque el video y el audio no van a
+# Git: un build hecho por Netlify daria una landing sin material.
+# Este bloque queda por si algun dia el media se mueve a un CDN externo.
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+# SPA: cualquier ruta cae en index.html
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# Los assets con hash en el nombre se cachean para siempre
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# Video, audio e imagenes: cache largo pero revalidable
+[[headers]]
+  for = "/video/*"
+  [headers.values]
+    Cache-Control = "public, max-age=604800"
+
+[[headers]]
+  for = "/audio/*"
+  [headers.values]
+    Cache-Control = "public, max-age=604800"
+
+[[headers]]
+  for = "/img/*"
+  [headers.values]
+    Cache-Control = "public, max-age=604800"

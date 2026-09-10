@@ -1,7 +1,9 @@
 # Estado del proyecto
 
-**Última actualización:** 2 de septiembre de 2026
-**Rama:** `master`
+**Última actualización:** 10 de septiembre de 2026
+**Rama:** `main`
+
+**En vivo:** https://landing-gorila.netlify.app
 
 Dónde estamos hoy: qué está listo y qué sigue. Es lo único de `notas/` que
 cambia cada sesión.
@@ -55,10 +57,29 @@ npm run dev     # → http://localhost:5173
       con una secuencia de imágenes.
 - [x] ~~Imagen Open Graph~~ — usa el poster del hero.
 - [ ] El interludio (sección 2) no tiene animación de entrada. El hook
-      [useEnVista](../src/lib/useEnVista.ts) está listo para eso.
+      [useEnVista](../src/lib/useEnVista.ts) ya se usa en `Transicion`, así
+      que el patrón está resuelto: falta aplicarlo acá.
 - [x] ~~El `<title>` decía "Vanta — Serie 01"~~ — corregido, con Open Graph.
 
 ---
+
+## Seguridad
+
+Repaso hecho el 3 de septiembre de 2026 sobre el código: **sin hallazgos**.
+No hay sinks de XSS, secretos, llamadas de red ni almacenamiento, y
+`npm audit` da 0 vulnerabilidades. El detalle y el porqué están en
+[DECISIONES.md](DECISIONES.md).
+
+Lo que queda abierto está **fuera del código**:
+
+- [ ] **Cabeceras de seguridad** (CSP, `X-Frame-Options`, `nosniff`,
+      `Referrer-Policy`). Ya no está bloqueado: se publica en Netlify, así
+      que van en `netlify.toml`. HSTS ya lo pone Netlify solo.
+- [ ] **Autoalojar las fuentes de Google.** Es la única dependencia externa
+      en tiempo de ejecución que queda; sacarla también acelera la carga.
+- [ ] **Fijar las versiones de las dependencias** (quitar los `^`). Es la
+      defensa contra cadena de suministro, el riesgo más realista del
+      proyecto.
 
 ## Pendiente técnico
 
@@ -82,3 +103,39 @@ carpeta de Descargas de Nico:
 | `audio/ambiente.mp3` | `wav-session-22--old-school-hip-hop-mix--20-tracks.mp3` |
 
 El tratamiento de cada uno está en [DECISIONES.md](DECISIONES.md).
+
+---
+
+## Deploy
+
+La landing está en vivo en **https://landing-gorila.netlify.app**
+(Netlify, proyecto `landing-gorila`, equipo Nicolas). Publicada el 10 de
+septiembre de 2026.
+
+Para actualizar el sitio:
+
+```bash
+npm run build
+npx netlify deploy --prod --dir=dist
+```
+
+**Es a mano, y tiene que serlo.** El repo no conecta a Netlify para builds
+automáticos: como el video y el audio no están en Git (ver la sección de
+arriba), un build hecho por Netlify desde GitHub daría una landing sin
+material. Subir el `dist` armado en local es lo que garantiza que los 38 MB
+lleguen. El porqué completo y las alternativas descartadas están en
+[DECISIONES.md](DECISIONES.md).
+
+Consecuencia: **un push a GitHub no actualiza el sitio.**
+
+La configuración vive en [netlify.toml](../netlify.toml): redirect de SPA y
+cache de assets (`immutable` para `/assets/*`, que llevan hash en el nombre;
+una semana para video, audio e imágenes).
+
+### Pendiente del deploy
+
+- [ ] **El video del hero pesa 17,8 MB** (`gorila-scroll.mp4`) y se sirve
+      desde el mismo origen. En una conexión lenta es una espera larga justo
+      en la primera impresión. Comprimirlo o cargarlo en dos etapas.
+- [ ] **Escribir las cabeceras de seguridad** en `netlify.toml` (ver la
+      sección de Seguridad).

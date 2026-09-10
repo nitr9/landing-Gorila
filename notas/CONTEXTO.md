@@ -7,20 +7,19 @@ primera vez en esta sesión, seguí el orden de abajo antes de tocar código.
 
 ## Qué es esto
 
-Un proyecto web **por definir**. La landing anterior se descartó el 2 de
-septiembre de 2026 y todavía no se decidió qué se construye en su lugar.
+La landing de **NT®**, una marca ficticia de auriculares: un ejercicio de
+diseño y de marca personal, sin producto real detrás.
 
-Lo que quedó es el andamiaje: **React 18 + Vite 6 + TypeScript + Tailwind +
-shadcn/ui**. Nada del contenido anterior sobrevive.
-
-**Antes de construir nada, hay que definir el proyecto nuevo.** Si no está
-definido en [ESTADO.md](ESTADO.md), preguntarlo en vez de asumirlo.
+Stack: **React 18 + Vite 6 + TypeScript + Tailwind + shadcn/ui**. El
+recorrido son cuatro secciones encadenadas sin costura visible, con video,
+scroll que controla la imagen y un reproductor de audio que alimenta las
+animaciones. El detalle está en [ESTADO.md](ESTADO.md).
 
 ---
 
 ## Leer antes de tocar nada
 
-1. **[notas/ESTADO.md](ESTADO.md)** — dónde estamos hoy y qué falta definir
+1. **[notas/ESTADO.md](ESTADO.md)** — dónde estamos hoy y qué falta
 2. **[notas/DECISIONES.md](DECISIONES.md)** — por qué las cosas son como son,
    incluidos los caminos que ya se descartaron
 
@@ -63,6 +62,9 @@ El porqué de cada una está en [DECISIONES.md](DECISIONES.md).
   loop ping-pong. Sin eso, el loop salta.
 - **No escalar videos por cuenta propia.** El upscale se hace en el
   generador o no se hace.
+- **Nada de secretos en el código.** La landing es estática y no tiene
+  APIs; si alguna vez entra una, ojo con Vite: toda variable `VITE_` queda
+  incrustada en el JavaScript público y la ve cualquiera.
 - **El espacio en disco es limitado.** No dejar builds ni artefactos
   acumulados; `node_modules` y `dist` se borran sin miedo y se regeneran.
 
@@ -88,6 +90,6 @@ El porqué de cada una está en [DECISIONES.md](DECISIONES.md).
 |---|---|---|
 | `src/` | El código de la página | Sí |
 | `notas/` | Estado, decisiones y este archivo | Sí |
-| `public/` | Assets estáticos (hoy solo el favicon) | Sí |
-| `public/video/` | Videos | **No** |
+| `public/` | Favicon y `img/` (posters de los videos) | Sí |
+| `public/video/`, `public/audio/` | Videos y música | **No** |
 | `node_modules/`, `dist/` | Dependencias y build | **No** |
