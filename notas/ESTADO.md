@@ -72,9 +72,19 @@ No hay sinks de XSS, secretos, llamadas de red ni almacenamiento, y
 
 Lo que queda abierto está **fuera del código**:
 
-- [ ] **Cabeceras de seguridad** (CSP, `X-Frame-Options`, `nosniff`,
-      `Referrer-Policy`). Ya no está bloqueado: se publica en Netlify, así
-      que van en `netlify.toml`. HSTS ya lo pone Netlify solo.
+- [x] ~~**Cabeceras de seguridad**~~ — HECHO el 10/9/2026, en `netlify.toml`:
+      CSP, `X-Frame-Options`, `nosniff`, `Referrer-Policy` y
+      `Permissions-Policy`. HSTS lo pone Netlify solo.
+
+      **La CSP está medida contra el sitio, no copiada de una plantilla.**
+      `style-src` lleva `'unsafe-inline'` porque la página tiene **70
+      elementos con atributo `style=`** —las animaciones— y sin eso no
+      renderiza nada; es la única concesión. Probado sirviendo el `dist`
+      real con las cabeceras puestas: **cero violaciones de CSP, cero errores
+      de JS**, los videos cargan y la tipografía se aplica.
+
+      **Ojo: todavía no están en vivo.** El deploy es manual, así que salen
+      recién cuando se suba el próximo `dist`.
 - [ ] **Autoalojar las fuentes de Google.** Es la única dependencia externa
       en tiempo de ejecución que queda; sacarla también acelera la carga.
 - [ ] **Fijar las versiones de las dependencias** (quitar los `^`). Es la
