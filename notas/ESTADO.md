@@ -84,12 +84,39 @@ Lo que queda abierto está **fuera del código**:
       de JS**, los videos cargan y la tipografía se aplica.
 
       **Ojo: todavía no están en vivo.** El deploy es manual, así que salen
-      recién cuando se suba el próximo `dist`.
-- [ ] **Autoalojar las fuentes de Google.** Es la única dependencia externa
-      en tiempo de ejecución que queda; sacarla también acelera la carga.
-- [ ] **Fijar las versiones de las dependencias** (quitar los `^`). Es la
-      defensa contra cadena de suministro, el riesgo más realista del
-      proyecto.
+      recién cuando se suba el próximo `dist`. Verificado contra el sitio
+      publicado el 10/9/2026: responde **0 de 5** cabeceras. Lo mismo vale
+      para las fuentes autoalojadas y para todo lo de abajo — está construido
+      en `dist/` y esperando un `npx netlify deploy --prod --dir=dist`, que
+      necesita la sesión de Netlify de Nico.
+- [x] **Autoalojar las fuentes de Google.** HECHO el 10/9/2026. Los `.woff2`
+      viven en `public/fonts` y los `@font-face` están al principio de
+      `src/index.css`; el `<link>` de `index.html` se fue y quedaron dos
+      `preload` de las dos caras que se ven primero.
+
+      **De los 18 bloques que sirve Google se bajaron los 8 latinos.** Google
+      parte cada familia por alfabeto, y los otros diez eran cirílico, griego
+      y vietnamita. Los bloques se copiaron tal cual con la URL cambiada,
+      `unicode-range` incluido: eso es lo que hace que el navegador baje el
+      `latin-ext` sólo si hace falta, y no conviene «simplificarlo».
+
+      **Medido sirviendo el `dist` real:** cero pedidos a dominios de
+      terceros; de los 8 archivos el navegador bajó **3** —la página no usa
+      caracteres `latin-ext` ni itálica arriba—; las tres caras se aplican
+      (`Instrument Serif 400`, `Inter 400`, `Inter 500`), cero errores de
+      consola, y la captura se ve igual que antes, con los acentos bien.
+
+      **Y eso cerró la CSP:** se borraron `fonts.googleapis.com` y
+      `fonts.gstatic.com` de `netlify.toml`, así que ahora
+      `default-src 'none'` es cierto de punta a punta. No queda ningún origen
+      de terceros.
+- [x] **Fijar las versiones de las dependencias.** HECHO el 10/9/2026: las
+      **17** pasaron de `^x.y.z` a la versión exacta que estaba instalada.
+
+      El riesgo no era teórico: **9 de las 17 ya habían derivado** de lo
+      declarado. `vite` decía `^6.0.7` y estaba en 6.4.3, `typescript`
+      `^5.7.3` contra 5.9.3. Con el build saliendo de la máquina de Nico y el
+      deploy a mano, una versión comprometida entraba directo al sitio.
 
 ## Pendiente técnico
 

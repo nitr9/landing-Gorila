@@ -20,12 +20,22 @@
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="theme-color" content="#2c4a1e" />
 
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500&display=swap"
-      rel="stylesheet"
-    />
+    <!-- Las fuentes NO vienen de Google: están en `public/fonts` y las declara
+         `src/index.css`. Se trajeron el 10/9/2026 por dos motivos. Uno, que
+         era el último origen de terceros que quedaba, así que ahora la CSP
+         puede decir `default-src 'none'` y ser cierto de punta a punta. Y dos,
+         que cada visita le avisaba a Google quién entró, sin necesidad.
+
+         De los 18 bloques que sirve Google —parte cada familia por alfabeto—
+         se bajaron los 8 latinos. Los otros diez son cirílico, griego y
+         vietnamita, y este sitio está en español.
+
+         El `preload` va sólo en las dos que se ven primero —el cuerpo en
+         redonda y el display—; las otras seis las pide el navegador cuando
+         las necesita. Si alguna vez se cambia un peso o un estilo, hay que
+         bajar el .woff2: acá ya no hay nadie que lo resuelva al vuelo. -->
+    <link rel="preload" href="/fonts/inter-400-normal-latin.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/instrument-serif-400-normal-latin.woff2" as="font" type="font/woff2" crossorigin />
   </head>
   <body>
     <div id="root"></div>

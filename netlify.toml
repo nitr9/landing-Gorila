@@ -25,17 +25,22 @@
 #   - style-src lleva 'unsafe-inline' y NO es negligencia: la pagina tiene
 #     70 elementos con atributo style= —son las animaciones— asi que sin eso
 #     no renderiza nada. Es la unica concesion, y esta medida.
-#   - fonts.googleapis.com y fonts.gstatic.com son la unica dependencia
-#     externa en tiempo de ejecucion que queda. El dia que las fuentes se
-#     autoalojen —tambien pendiente en ESTADO.md— estas dos lineas se borran
-#     y la CSP queda sin ningun origen de terceros.
+#   - NO HAY NINGUN ORIGEN DE TERCEROS, y eso es a proposito. Hasta el
+#     10/9/2026 la CSP nombraba fonts.googleapis.com y fonts.gstatic.com,
+#     que eran la unica dependencia externa en tiempo de ejecucion. Ese dia
+#     las fuentes se pasaron a `public/fonts` y las dos lineas se borraron,
+#     que era lo que este mismo comentario dejaba anotado. Ahora
+#     `default-src 'none'` es cierto de punta a punta: todo lo que carga la
+#     pagina sale de su propio dominio.
+#     Si alguna vez hay que volver a agregar un origen aca, conviene
+#     preguntarse primero si no se puede autoalojar, como se hizo con esto.
 #   - img-src y media-src llevan blob: por el video y los posters.
 #   - frame-ancestors 'none' hace el trabajo de X-Frame-Options; el header
 #     se deja igual, por los navegadores viejos que no leen la CSP.
 [[headers]]
   for = "/*"
   [headers.values]
-    Content-Security-Policy = "default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob:; media-src 'self' blob:; connect-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'; object-src 'none'"
+    Content-Security-Policy = "default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: blob:; media-src 'self' blob:; connect-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'; object-src 'none'"
     X-Frame-Options = "DENY"
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"
