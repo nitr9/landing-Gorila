@@ -52,7 +52,9 @@ src/
 │   └── utils.ts             cn() helper
 ├── App.tsx  index.css  main.tsx
 
-public/          favicon, img/ (posters) — video/ and audio/ stay out of Git
+public/
+├── fonts/          8 self-hosted .woff2 — no request ever leaves the domain
+└── favicon, img/ (posters) — video/ and audio/ stay out of Git
 
 notas/           written in Spanish
 ├── ESTADO.md      where things stand today
@@ -92,6 +94,16 @@ attribute (the animations), and without it nothing renders. That is the only
 concession. `default-src 'none'` means any third party added from here on fails
 loudly instead of slipping in unnoticed.
 
-Google Fonts is the one remaining runtime dependency on someone else's server.
-Self-hosting it is still open in `ESTADO.md`; the day it happens, two lines
-come out of the CSP and no third-party origin is left.
+**No third-party origin is left.** Fonts used to come from Google; they now
+live in `public/fonts` and are declared in `src/index.css`. Of the 18 faces
+Google serves — it splits each family by alphabet — the 8 Latin ones were kept,
+`unicode-range` untouched, so the browser still fetches `latin-ext` only when a
+page actually needs it. Measured against the built site: **zero requests to
+third-party domains**, and only 3 of the 8 files downloaded.
+
+That is what allowed the two Google origins to come out of the CSP, so
+`default-src 'none'` is now true end to end.
+
+Dependency versions are pinned exactly, with no `^`. This is the one supply
+chain risk that is real here: the build runs on a developer machine and the
+deploy is manual, so a compromised release would go straight to the site.
